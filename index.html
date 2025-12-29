@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuestra Historia ♾️💖</title>
+<meta name="description" content="Diario romántico con portada animada, contador de días juntos y mini calendario de aniversarios." />
+<style>
+body{margin:0;font-family:system-ui;background:#120720;color:#fff}
+.cover{min-height:100vh;display:grid;place-items:center;padding:16px;
+background:radial-gradient(circle at top,#ff4da655,#120720)}
+.card{background:#1e0f33;border-radius:24px;padding:20px;max-width:900px;width:100%;
+box-shadow:0 20px 60px rgba(0,0,0,.6)}
+h1{margin-top:0}
+button{padding:12px 16px;border-radius:14px;border:none;background:#ff4da6;color:#fff;font-weight:700;cursor:pointer}
+button.alt{background:#2a1845}
+.msg{background:#2a1845;padding:10px;border-radius:14px;margin-top:8px;font-size:14px}
+.calendar{margin-top:14px;background:#2a1845;border-radius:16px;padding:12px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:6px}
+.cal-day{font-size:12px;text-align:center;opacity:.6}
+.cal-num{padding:8px;border-radius:10px;text-align:center;font-size:13px}
+.cal-num.today{background:#ff4da6}
+.cal-num.event{border:1px solid #ff4da6}
+.reminder{margin-top:10px;font-size:13px;color:#ffd6e9}
+@media(max-width:600px){.card{padding:14px}}
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="card">
+    <h1>🌹 Nuestra Historia ♾️</h1>
+    <p>🕯️ Lo escrito se queda. El tiempo cuenta.</p>
+
+    <div id="contador"></div>
+
+    <div class="calendar">
+      <strong>📅 Este mes</strong>
+      <div class="cal-grid" id="calDays"></div>
+      <div class="cal-grid" id="calNums"></div>
+      <div class="reminder" id="reminders"></div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button onclick="entrar()">💖 Entrar</button>
+    </div>
+  </div>
+</section>
+
+<section id="app" style="display:none;padding:20px">
+  <h2>📖 Escribe tu historia</h2>
+  <input id="titulo" placeholder="Título" style="width:100%;padding:10px;border-radius:10px"><br><br>
+  <textarea id="texto" placeholder="Escribe aquí..." style="width:100%;padding:10px;border-radius:10px"></textarea><br><br>
+  <button onclick="guardar()">Guardar</button>
+  <div id="lista"></div>
+</section>
+
+<script>
+const START_DATE = new Date("2025-08-06T20:00:00"); // ajustable
+const KEY="HISTORIA_CALENDARIO";
+let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+
+function entrar(){
+  document.querySelector(".cover").style.display="none";
+  document.getElementById("app").style.display="block";
+}
+
+function guardar(){
+  const t=titulo.value, x=texto.value;
+  if(!t && !x) return;
+  data.push({t,x,fecha:new Date().toISOString()});
+  localStorage.setItem(KEY,JSON.stringify(data));
+  titulo.value=""; texto.value="";
+  renderLista();
+}
+
+function renderLista(){
+  lista.innerHTML="";
+  data.slice().reverse().forEach(m=>{
+    const d=document.createElement("div");
+    d.className="msg";
+    d.textContent=m.t+" — "+m.x;
+    lista.appendChild(d);
+  });
+}
+
+function renderContador(){
+  const now=new Date();
+  const diff=Math.max(0,now-START_DATE);
+  const days=Math.floor(diff/86400000);
+  const months=Math.floor(days/30);
+  contador.innerHTML=`💞 ${days} días juntos · ${months} meses cumplidos`;
+}
+
+function renderCalendar(){
+  const now=new Date();
+  const y=now.getFullYear(), m=now.getMonth();
+  const first=new Date(y,m,1).getDay();
+  const total= new Date(y,m+1,0).getDate();
+  const days=["D","L","M","M","J","V","S"];
+  calDays.innerHTML=days.map(d=>`<div class='cal-day'>${d}</div>`).join("");
+  calNums.innerHTML="";
+  for(let i=0;i<first;i++) calNums.innerHTML+="<div></div>";
+  for(let d=1;d<=total;d++){
+    const cell=document.createElement("div");
+    cell.className="cal-num";
+    if(d===now.getDate()) cell.classList.add("today");
+    if(d===START_DATE.getDate()) cell.classList.add("event");
+    cell.textContent=d;
+    calNums.appendChild(cell);
+  }
+  reminders.textContent = (now.getDate()===START_DATE.getDate())
+    ? "🌹 Hoy es aniversario mensual"
+    : `⏳ Próximo aniversario: día ${START_DATE.getDate()}`;
+}
+
+renderContador();
+renderCalendar();
+renderLista();
+</script>
+
+</body>
+</html>
