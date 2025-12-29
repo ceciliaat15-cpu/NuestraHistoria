@@ -1,11 +1,806 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<title>Nuestra Historia ♾️💖</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nuestra Historia ♾️💖</title>
+  <meta name="description" content="Diario romántico + agenda de fechas importantes con guardado automático (localStorage), exportación e impresión." />
+  <style>
+    :root{
+      --bg0:#0b0613;
+      --bg1:#120720;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.06);
+      --line: rgba(255,255,255,.14);
+      --txt: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --soft: rgba(255,255,255,.55);
+      --accent:#ff4da6;
+      --accent2:#ffb3d9;
+      --good:#37d67a;
+      --warn:#ffd166;
+      --bad:#ff5d5d;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 14px;
+      --pad: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      color:var(--txt);
+      font-family:var(--sans);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(255,77,166,.18), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(255,179,217,.14), transparent 50%),
+        radial-gradient(700px 500px at 40% 90%, rgba(255,209,102,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25));
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:14px 16px}
+    .top{
+      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
+      box-shadow: var(--shadow);
+      display:grid;place-items:center;
+      font-size:22px;
+    }
+    h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .sub{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    button, .chip{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease, border .2s ease;
+      font-weight:650;
+      letter-spacing:.2px;
+    }
+    button:hover{background: rgba(255,255,255,.10)}
+    button:active{transform: translateY(1px)}
+    .primary{
+      border-color: rgba(255,77,166,.45);
+      background: linear-gradient(180deg, rgba(255,77,166,.22), rgba(255,77,166,.10));
+    }
+    .danger{
+      border-color: rgba(255,93,93,.50);
+      background: linear-gradient(180deg, rgba(255,93,93,.18), rgba(255,93,93,.08));
+    }
+    .ghost{
+      background: transparent;
+    }
+    main{max-width:1100px;margin:0 auto;padding:16px 16px 28px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .card{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+    .card .hd .title{font-size:14.5px;font-weight:800;letter-spacing:.3px}
+    .card .hd .desc{margin-top:4px;color:var(--muted);font-size:12.5px;line-height:1.35}
+    .card .bd{padding:14px}
+    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
+    input[type="text"], input[type="date"], input[type="time"], textarea, select{
+      width:100%;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      color: var(--txt);
+      border-radius: 12px;
+      padding:10px 11px;
+      outline:none;
+    }
+    textarea{min-height:120px;resize:vertical;line-height:1.45}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:10px}
+    @media (max-width: 560px){
+      .row,.row3{grid-template-columns:1fr}
+    }
+    .mini{
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px
+    }
+    .hint{
+      color:var(--soft);font-size:12px;margin-top:8px;line-height:1.35
+    }
+    .list{
+      display:flex;flex-direction:column;gap:10px
+    }
+    .item{
+      border:1px solid var(--line);
+      background: var(--card2);
+      border-radius: var(--radius2);
+      padding:12px;
+    }
+    .item .topline{
+      display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap
+    }
+    .tag{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      opacity:.95;
+    }
+    .item h3{
+      margin:6px 0 6px;
+      font-size:14.5px;
+      letter-spacing:.2px
+    }
+    .item p{
+      margin:0;color:rgba(255,255,255,.84);
+      white-space:pre-wrap;
+      line-height:1.45;
+      font-size:13.5px;
+    }
+    .item .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .pill{
+      display:inline-flex;align-items:center;gap:6px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.16);
+      padding:7px 10px;border-radius:999px;
+      color:var(--muted);font-size:12px
+    }
+    .searchbar{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap
+    }
+    .searchbar input{flex:1;min-width:220px}
+    .split{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-top:10px;
+    }
+    .kpi{
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center
+    }
+    .kpi .chip{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .footerNote{
+      margin-top:14px;
+      color:var(--soft);
+      font-size:12px;
+      text-align:center;
+      opacity:.9
+    }
+    .love{
+      font-weight:800;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color: transparent;
+    }
+
+    /* Print */
+    @media print{
+      header, .no-print{display:none !important}
+      body{background:#fff;color:#000}
+      .card, .item{box-shadow:none;background:#fff;border:1px solid #ddd}
+      .love{color:#000 !important;-webkit-text-fill-color:#000}
+      .tag, .desc, .hint, .chip, .pill{color:#333 !important}
+      input, textarea, select{border:1px solid #bbb;color:#000;background:#fff}
+    }
+  </style>
 </head>
 <body>
-<h1>Tu archivo completo va aquí</h1>
-<p>Este ZIP está listo para GitHub Pages. Reemplaza este texto con el HTML que te entregué arriba.</p>
+<header>
+  <div class="wrap top">
+    <div class="brand">
+      <div class="logo">💖</div>
+      <div>
+        <h1>Nuestra Historia <span class="love">para la eternidad</span> ♾️</h1>
+        <div class="sub">Diario + agenda romántica. Se guarda solo en tu navegador. Tradición: escribir. Futuro: nunca se pierde (si exportas). 😌</div>
+      </div>
+    </div>
+
+    <div class="actions no-print">
+      <button class="primary" id="btnNewEntry">➕ Nueva página</button>
+      <button id="btnNewDate">📅 Nueva fecha</button>
+      <button id="btnExport">⬇️ Exportar</button>
+      <button id="btnImport">⬆️ Importar</button>
+      <button class="ghost" id="btnPrint">🖨️ Imprimir</button>
+      <button class="danger" id="btnReset">🧨 Borrar todo</button>
+      <input id="fileImport" type="file" accept="application/json" style="display:none" />
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <!-- Diario -->
+    <section class="card">
+      <div class="hd">
+        <div class="title">📖 Diario de amor (las páginas de “nosotros”)</div>
+        <div class="desc">Escribe bonito, escribe claro. Aquí no hay “casi”: aquí hay historia.</div>
+      </div>
+      <div class="bd">
+        <div class="row">
+          <div>
+            <label>Para quién (opcional)</label>
+            <input type="text" id="toWho" placeholder="Ej: Para Fran 💘" />
+          </div>
+          <div>
+            <label>Emoji mood</label>
+            <select id="mood">
+              <option value="💖">💖 Amor</option>
+              <option value="😍">😍 Enamorada</option>
+              <option value="🥹">🥹 Ternura</option>
+              <option value="🔥">🔥 Pasión</option>
+              <option value="😂">😂 Risa</option>
+              <option value="🫶">🫶 Gracias</option>
+              <option value="💌">💌 Carta</option>
+              <option value="🌙">🌙 Noches</option>
+              <option value="☀️">☀️ Días</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Título de la página</label>
+        <input type="text" id="entryTitle" placeholder="Ej: El día que tu ‘sí’ me cambió el destino ✨" />
+
+        <label>Texto (tu voz, sin filtro)</label>
+        <textarea id="entryText" placeholder="Escribe aquí… 💞&#10;Tip: usa saltos de línea, se guardan."></textarea>
+
+        <div class="mini no-print">
+          <button class="primary" id="btnSaveEntry">💾 Guardar página</button>
+          <button id="btnClearEntry">🧽 Limpiar</button>
+          <span class="pill" id="autosaveState">Autoguardado: listo ✅</span>
+        </div>
+
+        <div class="hint">
+          Se guarda automáticamente mientras escribes. Y sí: lo romántico también puede ser eficiente.
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0" />
+
+        <div class="searchbar no-print">
+          <input type="text" id="searchEntries" placeholder="🔎 Buscar en tu historia (palabras, emojis, fechas…)" />
+          <button id="btnSortEntries">↕️ Orden: reciente</button>
+        </div>
+
+        <div class="split">
+          <div class="kpi">
+            <span class="chip">📚 Páginas: <b id="countEntries">0</b></span>
+            <span class="chip">🗓️ Fechas: <b id="countDates">0</b></span>
+          </div>
+          <div class="tag" id="lastSaved">Último guardado: —</div>
+        </div>
+
+        <div style="height:10px"></div>
+        <div class="list" id="entriesList"></div>
+
+        <div class="footerNote">
+          “Lo escrito queda.” Y si lo imprimes… queda todavía más. 📜😉
+        </div>
+      </div>
+    </section>
+
+    <!-- Agenda + línea del tiempo -->
+    <aside class="card">
+      <div class="hd">
+        <div class="title">📅 Fechas importantes + línea del tiempo</div>
+        <div class="desc">Anota lo que importa. Lo demás que lo resuelva el universo.</div>
+      </div>
+      <div class="bd">
+
+        <div class="row3">
+          <div>
+            <label>Nombre del momento</label>
+            <input type="text" id="dateName" placeholder="Ej: Nuestro aniversario 💍" />
+          </div>
+          <div>
+            <label>Fecha</label>
+            <input type="date" id="dateDay" />
+          </div>
+          <div>
+            <label>Hora (opcional)</label>
+            <input type="time" id="dateTime" />
+          </div>
+        </div>
+
+        <label>Detalle (opcional)</label>
+        <textarea id="dateNote" style="min-height:90px" placeholder="Ej: Cena, carta, detalle… y cero pretextos 😌"></textarea>
+
+        <div class="mini no-print">
+          <button id="btnSaveDate">💾 Guardar fecha</button>
+          <button id="btnClearDate">🧽 Limpiar</button>
+        </div>
+
+        <div class="hint">
+          Extra tip tradicional: una fecha sin detalle es como café sin aroma. Sirve… pero no enamora.
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0" />
+
+        <div class="no-print">
+          <label>Recordatorio (solo visual)</label>
+          <select id="reminderWindow">
+            <option value="0">Hoy</option>
+            <option value="1">En 1 día</option>
+            <option value="3">En 3 días</option>
+            <option value="7">En 7 días</option>
+            <option value="14">En 14 días</option>
+            <option value="30">En 30 días</option>
+          </select>
+          <div class="hint">No manda notificaciones del sistema (eso ya es otra liga). Aquí te marca lo próximo con colores.</div>
+        </div>
+
+        <div style="height:10px"></div>
+        <div class="list" id="datesList"></div>
+
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0" />
+
+        <div class="item">
+          <div class="topline">
+            <div class="tag">🧷 Promesa</div>
+            <div class="pill">💞</div>
+          </div>
+          <h3>Manifiesto corto (para cuando la vida quiera ponerse intensa)</h3>
+          <p id="manifest">
+No se trata de perfecto, se trata de leal.
+No se trata de hablar bonito, se trata de cumplir.
+Y si el mundo se acelera… nosotros nos tomamos de la mano y lo alcanzamos.</p>
+          <div class="btns no-print">
+            <button id="btnEditManifest">✍️ Editar manifiesto</button>
+          </div>
+        </div>
+
+        <div class="footerNote">
+          Esta página es tu altar digital. No le tengas miedo: úsalo. 🕯️💻
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<script>
+(() => {
+  const KEY = "HISTORIA_NOSOTROS_V1";
+  const nowISO = () => new Date().toISOString();
+
+  const el = (id) => document.getElementById(id);
+
+  const state = {
+    meta: { createdAt: nowISO(), updatedAt: nowISO() },
+    manifest: el("manifest").textContent.trim(),
+    entries: [],
+    dates: [],
+    ui: { sortEntries: "desc" } // desc = reciente primero
+  };
+
+  function load(){
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return;
+    try{
+      const saved = JSON.parse(raw);
+      if(saved && typeof saved === "object"){
+        Object.assign(state, saved);
+      }
+    }catch(e){
+      console.warn("No se pudo cargar:", e);
+    }
+  }
+
+  function save(){
+    state.meta.updatedAt = nowISO();
+    localStorage.setItem(KEY, JSON.stringify(state));
+    el("lastSaved").textContent = "Último guardado: " + new Date().toLocaleString();
+    pulseAutosave();
+    renderAll();
+  }
+
+  let autosaveTimer = null;
+  function scheduleSave(){
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(save, 250);
+  }
+
+  function pulseAutosave(){
+    const badge = el("autosaveState");
+    badge.textContent = "Autoguardado: listo ✅";
+    badge.style.borderColor = "rgba(55,214,122,.55)";
+    setTimeout(() => {
+      badge.style.borderColor = "rgba(255,255,255,.14)";
+    }, 450);
+  }
+
+  function uid(){
+    return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  }
+
+  function sanitize(s){ return (s || "").toString().trim(); }
+
+  function addEntry(payload){
+    const entry = {
+      id: uid(),
+      createdAt: nowISO(),
+      mood: payload.mood || "💖",
+      toWho: sanitize(payload.toWho),
+      title: sanitize(payload.title) || "Sin título (pero con amor) 💘",
+      text: sanitize(payload.text),
+    };
+    state.entries.unshift(entry);
+    save();
+  }
+
+  function updateEntry(id, patch){
+    const i = state.entries.findIndex(e => e.id === id);
+    if(i === -1) return;
+    state.entries[i] = { ...state.entries[i], ...patch };
+    save();
+  }
+
+  function deleteEntry(id){
+    state.entries = state.entries.filter(e => e.id !== id);
+    save();
+  }
+
+  function addDate(payload){
+    const name = sanitize(payload.name) || "Momento importante 💞";
+    const day = payload.day || "";
+    if(!day){
+      alert("Pon una fecha. El amor será libre, pero la agenda necesita fecha. 😌");
+      return;
+    }
+    const item = {
+      id: uid(),
+      createdAt: nowISO(),
+      name,
+      day,
+      time: payload.time || "",
+      note: sanitize(payload.note),
+    };
+    state.dates.push(item);
+    // ordenar por fecha asc
+    state.dates.sort((a,b) => (a.day+a.time).localeCompare(b.day+b.time));
+    save();
+  }
+
+  function deleteDate(id){
+    state.dates = state.dates.filter(d => d.id !== id);
+    save();
+  }
+
+  function daysUntil(dateStr){
+    // dateStr: YYYY-MM-DD
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const parts = dateStr.split("-").map(Number);
+    const target = new Date(parts[0], parts[1]-1, parts[2]);
+    const ms = target - start;
+    return Math.round(ms / (1000*60*60*24));
+  }
+
+  function badgeColorByWindow(diff, windowDays){
+    // diff: days until
+    if(diff < 0) return "rgba(255,255,255,.12)";
+    if(diff === 0) return "rgba(255,77,166,.30)";
+    if(diff <= windowDays) return "rgba(255,209,102,.22)";
+    if(diff <= windowDays*2) return "rgba(55,214,122,.16)";
+    return "rgba(255,255,255,.10)";
+  }
+
+  function renderEntries(){
+    const q = sanitize(el("searchEntries").value).toLowerCase();
+    const list = el("entriesList");
+    list.innerHTML = "";
+
+    let entries = [...state.entries];
+    if(state.ui.sortEntries === "asc") entries.reverse();
+
+    if(q){
+      entries = entries.filter(e =>
+        (e.title||"").toLowerCase().includes(q) ||
+        (e.text||"").toLowerCase().includes(q) ||
+        (e.toWho||"").toLowerCase().includes(q) ||
+        (e.mood||"").toLowerCase().includes(q)
+      );
+    }
+
+    entries.forEach(e => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      const when = new Date(e.createdAt).toLocaleString();
+      const who = e.toWho ? `• ${e.toWho}` : "";
+      div.innerHTML = `
+        <div class="topline">
+          <div class="tag">${e.mood} ${when} ${who}</div>
+          <div class="pill">📌</div>
+        </div>
+        <h3 contenteditable="true" data-edit="title" spellcheck="true">${escapeHtml(e.title)}</h3>
+        <p contenteditable="true" data-edit="text" spellcheck="true">${escapeHtml(e.text || "")}</p>
+        <div class="btns no-print">
+          <button data-act="editTo">👤 Editar “Para”</button>
+          <button data-act="delete" class="danger">🗑️ Borrar</button>
+        </div>
+      `;
+
+      // inline edit title/text
+      div.querySelectorAll("[contenteditable='true']").forEach(node => {
+        node.addEventListener("input", () => {
+          const field = node.getAttribute("data-edit");
+          updateEntry(e.id, { [field]: node.innerText.trim() });
+        });
+      });
+
+      div.querySelector("[data-act='delete']").addEventListener("click", () => {
+        if(confirm("¿Borrar esta página? Una vez se va… se va. 😶")){
+          deleteEntry(e.id);
+        }
+      });
+
+      div.querySelector("[data-act='editTo']").addEventListener("click", () => {
+        const v = prompt("¿Para quién es esta página? (ej: Para Fran 💘)", e.toWho || "");
+        if(v !== null) updateEntry(e.id, { toWho: v.trim() });
+      });
+
+      list.appendChild(div);
+    });
+  }
+
+  function renderDates(){
+    const list = el("datesList");
+    list.innerHTML = "";
+    const windowDays = Number(el("reminderWindow").value);
+
+    const today = new Date();
+    const y = today.getFullYear();
+
+    // render each date, and also show "recurrent" helper for anniversaries? (simple)
+    state.dates.forEach(d => {
+      const diff = daysUntil(d.day);
+      const bg = badgeColorByWindow(diff, windowDays);
+      const div = document.createElement("div");
+      div.className = "item";
+      div.style.background = bg;
+
+      const time = d.time ? ` ${d.time}` : "";
+      const when = `${d.day}${time}`;
+      const diffTxt = diff < 0 ? `Pasó hace ${Math.abs(diff)} día(s)` :
+                      diff === 0 ? "¡Es hoy! 💥💖" :
+                      `Faltan ${diff} día(s)`;
+
+      div.innerHTML = `
+        <div class="topline">
+          <div class="tag">🗓️ ${when}</div>
+          <div class="pill">${diffTxt}</div>
+        </div>
+        <h3>${escapeHtml(d.name)}</h3>
+        <p>${escapeHtml(d.note || "")}</p>
+        <div class="btns no-print">
+          <button data-act="toEntry">📝 Convertir en página</button>
+          <button data-act="delete" class="danger">🗑️ Borrar</button>
+        </div>
+      `;
+
+      div.querySelector("[data-act='delete']").addEventListener("click", () => {
+        if(confirm("¿Borrar esta fecha? Luego no digas ‘se me pasó’. 😌")){
+          deleteDate(d.id);
+        }
+      });
+
+      div.querySelector("[data-act='toEntry']").addEventListener("click", () => {
+        const title = `${d.name} ${d.time ? "⏰" : ""} ${d.day} 💞`;
+        const text = (d.note ? d.note + "\n\n" : "") +
+          "Hoy escribo esto para que no se lo lleve el tiempo:\n" +
+          "— ";
+        addEntry({ mood:"💌", toWho: "Para mi amor 💘", title, text });
+        // scroll top to diary
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      list.appendChild(div);
+    });
+  }
+
+  function renderCounts(){
+    el("countEntries").textContent = state.entries.length;
+    el("countDates").textContent = state.dates.length;
+  }
+
+  function renderManifest(){
+    el("manifest").textContent = state.manifest || "";
+  }
+
+  function renderAll(){
+    renderCounts();
+    renderManifest();
+    renderEntries();
+    renderDates();
+  }
+
+  function clearEntryForm(){
+    el("toWho").value = "";
+    el("mood").value = "💖";
+    el("entryTitle").value = "";
+    el("entryText").value = "";
+  }
+
+  function clearDateForm(){
+    el("dateName").value = "";
+    el("dateDay").value = "";
+    el("dateTime").value = "";
+    el("dateNote").value = "";
+  }
+
+  function escapeHtml(str){
+    return (str || "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  // Events
+  el("btnSaveEntry").addEventListener("click", () => {
+    const payload = {
+      toWho: el("toWho").value,
+      mood: el("mood").value,
+      title: el("entryTitle").value,
+      text: el("entryText").value
+    };
+    if(!sanitize(payload.text) && !sanitize(payload.title)){
+      alert("Escribe algo, aunque sea una línea. La eternidad no se llena sola. 😌");
+      return;
+    }
+    addEntry(payload);
+    clearEntryForm();
+  });
+
+  el("btnClearEntry").addEventListener("click", clearEntryForm);
+
+  el("btnSaveDate").addEventListener("click", () => {
+    addDate({
+      name: el("dateName").value,
+      day: el("dateDay").value,
+      time: el("dateTime").value,
+      note: el("dateNote").value
+    });
+    clearDateForm();
+  });
+
+  el("btnClearDate").addEventListener("click", clearDateForm);
+
+  el("btnNewEntry").addEventListener("click", () => {
+    clearEntryForm();
+    el("entryTitle").focus();
+  });
+
+  el("btnNewDate").addEventListener("click", () => {
+    clearDateForm();
+    el("dateName").focus();
+  });
+
+  // Autosave typing for forms (not for the list edit; those already save)
+  ["toWho","mood","entryTitle","entryText","dateName","dateDay","dateTime","dateNote","searchEntries","reminderWindow"].forEach(id=>{
+    el(id).addEventListener("input", scheduleSave);
+    el(id).addEventListener("change", scheduleSave);
+  });
+
+  // Sorting
+  el("btnSortEntries").addEventListener("click", () => {
+    state.ui.sortEntries = (state.ui.sortEntries === "desc") ? "asc" : "desc";
+    el("btnSortEntries").textContent = state.ui.sortEntries === "desc" ? "↕️ Orden: reciente" : "↕️ Orden: antiguo";
+    save();
+  });
+
+  // Manifest
+  el("btnEditManifest").addEventListener("click", () => {
+    const v = prompt("Edita tu manifiesto (corto, directo, real):", state.manifest || "");
+    if(v !== null){
+      state.manifest = v.trim();
+      save();
+    }
+  });
+
+  // Export / Import
+  el("btnExport").addEventListener("click", () => {
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().slice(0,10);
+    a.download = `nuestra_historia_${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+
+  el("btnImport").addEventListener("click", () => el("fileImport").click());
+
+  el("fileImport").addEventListener("change", async (ev) => {
+    const file = ev.target.files && ev.target.files[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      const incoming = JSON.parse(text);
+      if(!incoming || typeof incoming !== "object") throw new Error("Formato inválido");
+      // basic merge/replace
+      const ok = confirm("¿Importar y REEMPLAZAR tu historia actual por la del archivo?\n(Si no, cancela y exporta antes).");
+      if(!ok) return;
+
+      // keep minimal shape
+      state.meta = incoming.meta || state.meta;
+      state.manifest = incoming.manifest || state.manifest;
+      state.entries = Array.isArray(incoming.entries) ? incoming.entries : [];
+      state.dates = Array.isArray(incoming.dates) ? incoming.dates : [];
+      state.ui = incoming.ui || state.ui;
+
+      save();
+      alert("Listo. Tu historia volvió a respirar. 💖");
+    }catch(e){
+      alert("No pude importar ese archivo. Asegúrate que sea .json exportado desde aquí.");
+    }finally{
+      ev.target.value = "";
+    }
+  });
+
+  // Print
+  el("btnPrint").addEventListener("click", () => window.print());
+
+  // Reset
+  el("btnReset").addEventListener("click", () => {
+    const ok = confirm("¿Borrar TODO?\nEsto es como quemar cartas. Si no estás 100% segura, mejor exporta primero. 😶");
+    if(!ok) return;
+    localStorage.removeItem(KEY);
+    location.reload();
+  });
+
+  // Init
+  load();
+
+  // Restore manifesto in DOM from state
+  renderAll();
+  el("lastSaved").textContent = "Último guardado: " + new Date().toLocaleString();
+
+  // If empty, seed a gentle first page
+  if(state.entries.length === 0){
+    state.entries.unshift({
+      id: uid(),
+      createdAt: nowISO(),
+      mood: "💖",
+      toWho: "Para mi amor 💘",
+      title: "Página 1: El comienzo",
+      text:
+`Hoy abro este espacio como quien abre un cofre.
+Aquí vamos a guardar lo que sí vale: miradas, promesas, fechas y detalles.
+Si el tiempo corre… que corra. Nosotros dejamos huella. ♾️`
+    });
+    save();
+  }
+
+})();
+</script>
 </body>
 </html>
