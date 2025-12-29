@@ -1,84 +1,854 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nuestra Historia ♾️💖</title>
-<meta name="description" content="Diario romántico con portada, contador de días juntos y mensajes visibles">
-<style>
-body{margin:0;font-family:system-ui;background:#120720;color:#fff}
-.cover{min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#ff4da655,#120720)}
-.card{background:#1e0f33;border-radius:24px;padding:24px;max-width:800px;width:92%}
-h1{margin-top:0}
-button{padding:12px 16px;border-radius:14px;border:none;background:#ff4da6;color:#fff;font-weight:700;cursor:pointer}
-.msg{background:#2a1845;padding:12px;border-radius:14px;margin-top:10px}
-input,textarea{width:100%;padding:10px;border-radius:10px;margin-top:8px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nuestra Historia ♾️💖</title>
+  <meta name="description" content="Diario romántico con portada animada, contador de días juntos, secretos y mensajes visibles. Guarda en tu navegador." />
+  <style>
+    :root{
+      --bg0:#0b0613;
+      --bg1:#120720;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.06);
+      --line: rgba(255,255,255,.14);
+      --txt: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --soft: rgba(255,255,255,.55);
+      --accent:#ff4da6;
+      --accent2:#ffb3d9;
+      --rose:#ff2f7b;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 22px;
+      --radius2: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--txt); font-family:var(--sans);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(255,77,166,.18), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(255,179,217,.14), transparent 50%),
+        radial-gradient(700px 500px at 40% 90%, rgba(255,209,102,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh; overflow-x:hidden;
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .love{
+      font-weight:900;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+
+    /* ---- PORTADA ---- */
+    .cover{
+      position:fixed; inset:0; z-index:9999;
+      display:grid; place-items:center; padding:18px;
+      background:
+        radial-gradient(900px 520px at 20% 20%, rgba(255,77,166,.25), transparent 55%),
+        radial-gradient(750px 480px at 80% 30%, rgba(255,179,217,.20), transparent 55%),
+        radial-gradient(900px 600px at 50% 90%, rgba(255,209,102,.10), transparent 55%),
+        linear-gradient(180deg, rgba(7,0,24,.96), rgba(18,7,32,.96));
+      backdrop-filter: blur(8px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .cover.hide{opacity:0;transform:translateY(-8px);pointer-events:none}
+    .coverCard{
+      width:min(860px,100%);
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      border-radius: 28px;
+      box-shadow: 0 30px 110px rgba(0,0,0,.6);
+      overflow:hidden; position:relative;
+    }
+    .coverGlow{
+      position:absolute; inset:-40%;
+      background: conic-gradient(from 180deg, rgba(255,77,166,0), rgba(255,77,166,.34), rgba(255,179,217,.22), rgba(255,209,102,.12), rgba(255,77,166,.30), rgba(255,77,166,0));
+      filter: blur(34px);
+      animation: spin 10s linear infinite;
+      opacity:.95;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .petals{position:absolute; inset:0; pointer-events:none; overflow:hidden}
+    .petal{
+      position:absolute; top:-60px;
+      width:14px; height:18px;
+      border-radius: 60% 40% 60% 40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,179,217,.95), rgba(255,47,123,.78));
+      opacity:.75;
+      transform: rotate(15deg);
+      animation: fall linear infinite;
+    }
+    @keyframes fall{to{ transform: translateY(calc(100vh + 90px)) rotate(260deg); }}
+
+    .coverInner{position:relative; padding:18px}
+    .seal{display:flex; gap:12px; align-items:center}
+    .sealIcon{
+      width:52px;height:52px;border-radius:18px;display:grid;place-items:center;
+      background: radial-gradient(circle at 30% 30%, var(--accent2), var(--rose));
+      box-shadow: 0 18px 55px rgba(0,0,0,.38);
+      font-size:22px; user-select:none;
+      animation: floaty 3.2s ease-in-out infinite;
+    }
+    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .coverTitle{margin:0;font-size:22px;letter-spacing:.2px;line-height:1.1}
+    .coverSub{margin:6px 0 0;color:rgba(255,255,255,.78);font-size:13px;line-height:1.4}
+    .coverGrid{
+      margin-top:14px;
+      display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    }
+    @media (max-width: 680px){ .coverGrid{grid-template-columns:1fr} }
+    .miniCard{
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.20);
+      border-radius:18px;
+      padding:12px;
+    }
+    .miniCard .k{color:rgba(255,255,255,.70); font-size:12px}
+    .miniCard .v{margin-top:6px; font-weight:950; font-size:15px}
+    .coverActions{
+      margin-top:14px;
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between;
+      padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.14);
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: var(--txt);
+      padding:12px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.2px;
+      transition: transform .06s ease, background .2s ease, border .2s ease;
+      display:inline-flex; gap:8px; align-items:center;
+    }
+    .btn:hover{background: rgba(255,255,255,.12)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      border-color: rgba(255,47,123,.55);
+      background: linear-gradient(180deg, rgba(255,47,123,.24), rgba(255,47,123,.10));
+    }
+
+    .coverMsg{
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding:10px;
+    }
+    .coverMsg .t{font-weight:950;font-size:12.5px;color:rgba(255,255,255,.92)}
+    .coverMsg .s{margin-top:6px;font-size:12px;line-height:1.35;color:rgba(255,255,255,.72);white-space:pre-wrap}
+    .coverMsg .meta{margin-top:8px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.58)}
+
+    /* ---- APP ---- */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25));
+      border-bottom:1px solid var(--line);
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .brand{display:flex; align-items:center; gap:10px}
+    .logo{
+      width:44px;height:44px;border-radius:16px;
+      display:grid;place-items:center;
+      background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
+      box-shadow: var(--shadow);
+      user-select:none;
+      cursor:pointer;
+    }
+    .subline{color:var(--muted); font-size:12.5px; line-height:1.35}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.18);
+      padding:8px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      color:rgba(255,255,255,.80);
+      user-select:none;
+      margin-left:8px;
+    }
+    .badge b{color:#fff}
+
+    .grid{
+      display:grid; gap:14px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+    .hd .title{font-size:14.5px;font-weight:950;letter-spacing:.2px}
+    .hd .desc{margin-top:4px;color:var(--muted);font-size:12.5px;line-height:1.35}
+    .bd{padding:14px}
+
+    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
+    input[type="text"], input[type="date"], input[type="time"], textarea{
+      width:100%;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      color: var(--txt);
+      border-radius: 12px;
+      padding:10px 11px;
+      outline:none;
+    }
+    textarea{min-height:120px;resize:vertical;line-height:1.45}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width: 560px){ .row{grid-template-columns:1fr} }
+
+    .mini{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    .pill{
+      display:inline-flex;align-items:center;gap:6px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.16);
+      padding:7px 10px;border-radius:999px;
+      color:var(--muted);font-size:12px
+    }
+    .item{
+      border:1px solid var(--line);
+      background: var(--card2);
+      border-radius: var(--radius2);
+      padding:12px;
+      margin-top:10px;
+    }
+    .item .tag{font-family:var(--mono);font-size:12px;color:var(--muted)}
+    .item h3{margin:6px 0 6px;font-size:14.5px;letter-spacing:.2px}
+    .item p{margin:0;color:rgba(255,255,255,.84);white-space:pre-wrap;line-height:1.45;font-size:13.5px}
+    .btns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+
+    /* ---- Modales ---- */
+    .modalBack{
+      position:fixed; inset:0; z-index:9998;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+      display:none;
+      padding:18px;
+    }
+    .modalBack.show{display:grid; place-items:center}
+    .modal{
+      width:min(760px, 100%);
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(15,8,26,.92);
+      border-radius: 22px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.6);
+      overflow:hidden;
+    }
+    .modalHd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .modalHd .t{font-weight:950; letter-spacing:.2px}
+    .modalHd .s{margin-top:4px; font-size:12px; color:rgba(255,255,255,.74); line-height:1.35}
+    .modalBd{padding:14px}
+    .modalRow{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 560px){ .modalRow{grid-template-columns:1fr} }
+    .closeX{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:950;
+    }
+
+    /* Dock móvil */
+    .dock{
+      position:fixed; left:12px; right:12px; bottom:12px;
+      z-index:60;
+      display:none;
+      gap:10px;
+      padding:10px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+    .dock .btn{flex:1; justify-content:center}
+    @media (max-width: 780px){
+      .dock{display:flex}
+      .hideOnMobile{display:none}
+      body{padding-bottom:100px}
+    }
+
+    /* Print */
+    @media print{
+      header, .dock, .cover, .modalBack{display:none !important}
+      body{background:#fff;color:#000}
+    }
+  </style>
 </head>
+
 <body>
 
+<!-- PORTADA -->
 <section class="cover" id="cover">
-  <div class="card">
-    <h1>🌹 Nuestra Historia ♾️</h1>
-    <p>🕯️ Donde lo escrito se queda</p>
-    <div id="mensajes"></div>
-    <button onclick="entrar()">💖 Entrar a escribir</button>
+  <div class="coverCard">
+    <div class="coverGlow"></div>
+    <div class="petals" id="petals"></div>
+
+    <div class="coverInner">
+      <div class="seal">
+        <div class="sealIcon">🌹</div>
+        <div>
+          <h2 class="coverTitle">Nuestra Historia <span class="love">para la eternidad</span> ♾️</h2>
+          <div class="coverSub">Lo clásico nunca falla: escribir. Lo moderno ayuda: guardarlo. Y el chisme… se queda afuera. 😌</div>
+        </div>
+      </div>
+
+      <div class="coverGrid">
+        <div class="miniCard">
+          <div class="k">🕯️ Contador</div>
+          <div class="v" id="coverTogether">—</div>
+          <div class="coverSub" style="margin-top:8px">Lo puedes ajustar (fecha y hora real).</div>
+        </div>
+
+        <div class="miniCard">
+          <div class="k">💌 Últimos mensajes</div>
+          <div class="coverSub" style="margin-top:8px">Lo más reciente que escribiste:</div>
+          <div id="coverMessages" style="margin-top:10px; display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+      </div>
+
+      <div class="coverActions">
+        <button class="btn primary" id="btnEnter">💖 Entrar</button>
+        <button class="btn" id="btnGoWrite">📝 Escribir ahora</button>
+        <button class="btn" id="btnOpenSettings">⚙️ Ajustes</button>
+        <button class="btn" id="btnOpenSecret">💌 Secretos</button>
+      </div>
+    </div>
   </div>
 </section>
 
-<section id="app" style="display:none;padding:20px">
-  <h2>📖 Escribe tu historia</h2>
-  <input id="titulo" placeholder="Título">
-  <textarea id="texto" placeholder="Escribe aquí..."></textarea>
-  <button onclick="guardar()">Guardar</button>
-  <div id="lista"></div>
-</section>
+<header>
+  <div class="wrap topbar">
+    <div class="brand">
+      <div class="logo" id="roseHeader" title="Mantén presionado para secretos 💌">💖</div>
+      <div>
+        <div style="font-weight:950;letter-spacing:.2px">Nuestra Historia <span class="love">para la eternidad</span> ♾️</div>
+        <div class="subline">
+          Diario + recuerdos. Guardado en tu navegador.
+          <span class="badge">🕯️ <span id="togetherLabelInline">Juntos</span>: <b id="togetherText">—</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hideOnMobile" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+      <button class="btn" id="btnSecretQuick">💌 Secretos</button>
+      <button class="btn" id="btnSettingsQuick">⚙️ Ajustes</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="card">
+      <div class="hd">
+        <div class="title">📖 Escribe tu historia</div>
+        <div class="desc">Aquí no se “improvisa”: aquí se construye. Una línea a la vez. 🌹</div>
+      </div>
+      <div class="bd">
+        <label>Título</label>
+        <input id="titulo" placeholder="Ej: El día que me elegiste 💞" />
+
+        <label>Texto</label>
+        <textarea id="texto" placeholder="Escribe aquí…"></textarea>
+
+        <div class="mini">
+          <button class="btn primary" id="btnGuardar">💾 Guardar</button>
+          <button class="btn" id="btnLimpiar">🧽 Limpiar</button>
+          <span class="pill" id="status">Autoguardado: listo ✅</span>
+        </div>
+
+        <div id="lista"></div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="hd">
+        <div class="title">🧷 Manifiesto</div>
+        <div class="desc">Corto, directo, con valores. Lo demás es ruido.</div>
+      </div>
+      <div class="bd">
+        <div class="item">
+          <div class="tag">🌙 Promesa</div>
+          <h3 id="manifestTitle">De nosotros, para nosotros</h3>
+          <p id="manifestText">No se trata de perfecto, se trata de leal.
+No se trata de hablar bonito, se trata de cumplir.
+Y si el mundo se acelera… nosotros nos tomamos de la mano y lo alcanzamos.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<!-- Dock móvil -->
+<div class="dock">
+  <button class="btn primary" id="dockWrite">📝 Escribir</button>
+  <button class="btn" id="dockSettings">⚙️</button>
+  <button class="btn" id="dockSecret">💌</button>
+</div>
+
+<!-- Modal AJUSTES -->
+<div class="modalBack" id="settingsBack" aria-hidden="true">
+  <div class="modal">
+    <div class="modalHd">
+      <div>
+        <div class="t">⚙️ Ajustes del contador</div>
+        <div class="s">Pon la fecha y hora real. Tradición: exactitud. Futuro: memoria viva. 🕯️</div>
+      </div>
+      <button class="closeX" id="settingsClose">✖</button>
+    </div>
+    <div class="modalBd">
+      <div class="modalRow">
+        <div>
+          <label>Inicio (fecha)</label>
+          <input type="date" id="togetherDate" />
+        </div>
+        <div>
+          <label>Inicio (hora)</label>
+          <input type="time" id="togetherTime" />
+        </div>
+      </div>
+
+      <label>Etiqueta (opcional)</label>
+      <input type="text" id="togetherLabel" placeholder="Ej: Desde que dijimos ‘sí’ 💍" />
+
+      <div class="mini">
+        <button class="btn primary" id="btnSaveSettings">💾 Guardar</button>
+        <button class="btn" id="btnCloseSettings">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal SECRETOS -->
+<div class="modalBack" id="secretBack" aria-hidden="true">
+  <div class="modal">
+    <div class="modalHd">
+      <div>
+        <div class="t">💌 Mensajes secretos</div>
+        <div class="s">Con clave. Porque “curiosos” hay en todos lados. 😌</div>
+      </div>
+      <button class="closeX" id="secretClose">✖</button>
+    </div>
+    <div class="modalBd">
+      <div class="modalRow">
+        <div>
+          <label>Clave</label>
+          <input type="text" id="secretKey" placeholder="Pon una frase clave" />
+        </div>
+        <div style="display:flex;align-items:end">
+          <button class="btn primary" id="btnUnlock" style="width:100%;justify-content:center">🔓 Abrir</button>
+        </div>
+      </div>
+
+      <div id="secretZone" style="display:none">
+        <label>Tu secreto</label>
+        <textarea id="secretText" placeholder="Aquí va lo que NO es para ojos ajenos…"></textarea>
+
+        <div class="mini">
+          <button class="btn primary" id="btnSaveSecret">💾 Guardar secreto</button>
+          <button class="btn" id="btnLock">🔒 Cerrar</button>
+        </div>
+
+        <div class="subline" style="margin-top:10px">
+          Nota: esto es privacidad “casual”. Si quieres cifrado fuerte de verdad, lo armamos.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-const KEY="HISTORIA_FINAL";
-let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+(() => {
+  const KEY = "HISTORIA_ROMANTICA_V1";
 
-function renderPortada(){
-  const box=document.getElementById("mensajes");
-  box.innerHTML="";
-  data.slice(-3).reverse().forEach(m=>{
-    const d=document.createElement("div");
-    d.className="msg";
-    d.textContent=m.titulo+" — "+m.texto.slice(0,80);
-    box.appendChild(d);
+  const el = (id) => document.getElementById(id);
+  const nowISO = () => new Date().toISOString();
+
+  const state = {
+    meta: { createdAt: nowISO(), updatedAt: nowISO() },
+    together: { startDate: "2025-08-06", startTime: "20:00", label: "Juntos" },
+    entries: [],
+    secrets: { keyHash: "", payload: "" },
+  };
+
+  // ---------- helpers ----------
+  function save(){
+    state.meta.updatedAt = nowISO();
+    localStorage.setItem(KEY, JSON.stringify(state));
+    pulse();
+    renderAll();
+  }
+  function load(){
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return;
+    try{
+      const s = JSON.parse(raw);
+      if(s && typeof s === "object"){
+        Object.assign(state, s);
+        state.together = { ...state.together, ...(s.together || {}) };
+        state.secrets  = { ...state.secrets,  ...(s.secrets  || {}) };
+        state.entries  = Array.isArray(s.entries) ? s.entries : [];
+      }
+    }catch(_){}
+  }
+  function pulse(){
+    const badge = el("status");
+    badge.textContent = "Autoguardado: listo ✅";
+    badge.style.borderColor = "rgba(55,214,122,.55)";
+    setTimeout(()=> badge.style.borderColor = "rgba(255,255,255,.14)", 450);
+  }
+  function esc(str){
+    return (str||"").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+  function uid(){ return Math.random().toString(16).slice(2)+"-"+Date.now().toString(16); }
+  function sanitize(s){ return (s||"").toString().trim(); }
+
+  // ---------- petals ----------
+  function seedPetals(){
+    const host = el("petals");
+    if(!host) return;
+    host.innerHTML = "";
+    const n = 18;
+    for(let i=0;i<n;i++){
+      const p = document.createElement("div");
+      p.className = "petal";
+      const left = Math.random()*100;
+      const dur = 7 + Math.random()*8;
+      const delay = Math.random()*6;
+      const size = 10 + Math.random()*10;
+      p.style.left = left + "vw";
+      p.style.animationDuration = dur + "s";
+      p.style.animationDelay = (-delay) + "s";
+      p.style.width = size + "px";
+      p.style.height = (size*1.25) + "px";
+      p.style.opacity = (0.45 + Math.random()*0.4).toFixed(2);
+      host.appendChild(p);
+    }
+  }
+
+  // ---------- together counter ----------
+  function parseStart(){
+    const d = state.together.startDate || "";
+    const t = state.together.startTime || "00:00";
+    if(!d) return null;
+    const [Y,M,D] = d.split("-").map(Number);
+    const [h,m] = (t||"00:00").split(":").map(Number);
+    return new Date(Y,(M||1)-1,D||1,h||0,m||0,0,0);
+  }
+  function diffTogether(){
+    const start = parseStart();
+    if(!start) return null;
+    const now = new Date();
+    let ms = now - start;
+    if(ms < 0) ms = 0;
+    const totalMin = Math.floor(ms / 60000);
+    const days = Math.floor(totalMin / (60*24));
+    const hours = Math.floor((totalMin - days*60*24)/60);
+    const minutes = totalMin % 60;
+    return {days,hours,minutes};
+  }
+  function renderTogether(){
+    const d = diffTogether();
+    const label = sanitize(state.together.label) || "Juntos";
+    el("togetherLabelInline").textContent = label;
+    if(!d){
+      el("togetherText").textContent = "configura fecha";
+      el("coverTogether").textContent = "Configura la fecha 🕯️";
+      return;
+    }
+    const text = `${d.days} días + ${d.hours}h ${d.minutes}m`;
+    el("togetherText").textContent = text;
+    el("coverTogether").textContent = text;
+  }
+
+  // ---------- entries ----------
+  function addEntry(title, text){
+    const t = sanitize(title);
+    const x = sanitize(text);
+    if(!t && !x) return;
+
+    state.entries.push({
+      id: uid(),
+      createdAt: nowISO(),
+      title: t || "Sin título (pero con amor) 💘",
+      text: x
+    });
+    save();
+  }
+
+  function renderList(){
+    const host = el("lista");
+    host.innerHTML = "";
+    const arr = [...state.entries].reverse();
+
+    arr.forEach(e=>{
+      const div = document.createElement("div");
+      div.className = "item";
+      const when = new Date(e.createdAt).toLocaleString();
+      div.innerHTML = `
+        <div class="tag">🗓️ ${esc(when)}</div>
+        <h3 contenteditable="true" data-id="${esc(e.id)}" data-k="title">${esc(e.title)}</h3>
+        <p contenteditable="true" data-id="${esc(e.id)}" data-k="text">${esc(e.text)}</p>
+        <div class="btns">
+          <button class="btn" data-del="${esc(e.id)}">🗑️ Borrar</button>
+        </div>
+      `;
+      host.appendChild(div);
+    });
+
+    host.querySelectorAll("[contenteditable='true']").forEach(n=>{
+      n.addEventListener("input", ()=>{
+        const id = n.getAttribute("data-id");
+        const k  = n.getAttribute("data-k");
+        const i = state.entries.findIndex(x=>x.id===id);
+        if(i>-1){ state.entries[i][k] = n.innerText.trim(); save(); }
+      });
+    });
+
+    host.querySelectorAll("[data-del]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const id = b.getAttribute("data-del");
+        if(confirm("¿Borrar esta página? Si se va… se va. 😶")){
+          state.entries = state.entries.filter(x=>x.id!==id);
+          save();
+        }
+      });
+    });
+  }
+
+  function renderCoverMessages(){
+    const box = el("coverMessages");
+    box.innerHTML = "";
+    const last = (state.entries || []).slice(-3).reverse();
+    if(last.length === 0){
+      box.innerHTML = `
+        <div class="coverMsg">
+          <div class="t">Aún no hay páginas 🌙</div>
+          <div class="s">Escribe la primera línea… y listo: ya empezó la eternidad.</div>
+          <div class="meta">Tip: “Escribir ahora” y guarda</div>
+        </div>`;
+      return;
+    }
+    last.forEach(e=>{
+      const when = new Date(e.createdAt).toLocaleString();
+      const snippet = (e.text||"").trim().slice(0, 120) + (((e.text||"").trim().length>120) ? "…" : "");
+      const div = document.createElement("div");
+      div.className = "coverMsg";
+      div.innerHTML = `
+        <div class="t">💖 ${esc(e.title)}</div>
+        <div class="s">${esc(snippet || "—")}</div>
+        <div class="meta">${esc(when)}</div>
+      `;
+      box.appendChild(div);
+    });
+  }
+
+  // ---------- modals ----------
+  const settingsBack = el("settingsBack");
+  const secretBack = el("secretBack");
+
+  function openModal(back){ back.classList.add("show"); back.setAttribute("aria-hidden","false"); }
+  function closeModal(back){ back.classList.remove("show"); back.setAttribute("aria-hidden","true"); }
+
+  // ---------- secrets (privacidad casual) ----------
+  function simpleHash(str){
+    let h = 2166136261;
+    for(let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return (h>>>0).toString(16);
+  }
+  function xorBytes(text, key){
+    const t = new TextEncoder().encode(text);
+    const k = new TextEncoder().encode(key);
+    const out = new Uint8Array(t.length);
+    for(let i=0;i<t.length;i++) out[i] = t[i] ^ k[i % k.length];
+    return out;
+  }
+  function toB64(u8){
+    let s=""; u8.forEach(b=> s += String.fromCharCode(b));
+    return btoa(s);
+  }
+  function fromB64(b64){
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function encryptAndStore(key, text){
+    state.secrets.payload = toB64(xorBytes(text, key));
+    state.secrets.keyHash = simpleHash(key);
+    save();
+  }
+  function decryptPayload(key){
+    if(!state.secrets.payload) return "";
+    const bytes = fromB64(state.secrets.payload);
+    const k = new TextEncoder().encode(key);
+    const out = new Uint8Array(bytes.length);
+    for(let i=0;i<bytes.length;i++) out[i] = bytes[i] ^ k[i % k.length];
+    return new TextDecoder().decode(out);
+  }
+
+  // ---------- wire events ----------
+  let autosaveTimer=null;
+  function scheduleSave(){
+    clearTimeout(autosaveTimer);
+    autosaveTimer=setTimeout(save, 220);
+  }
+
+  el("btnGuardar").addEventListener("click", ()=>{
+    addEntry(el("titulo").value, el("texto").value);
+    el("titulo").value=""; el("texto").value="";
+    el("titulo").focus();
   });
-}
-
-function entrar(){
-  document.getElementById("cover").style.display="none";
-  document.getElementById("app").style.display="block";
-  renderLista();
-}
-
-function guardar(){
-  const t=document.getElementById("titulo").value;
-  const x=document.getElementById("texto").value;
-  if(!t && !x) return;
-  data.push({titulo:t,texto:x,fecha:new Date()});
-  localStorage.setItem(KEY,JSON.stringify(data));
-  document.getElementById("titulo").value="";
-  document.getElementById("texto").value="";
-  renderLista();
-  renderPortada();
-}
-
-function renderLista(){
-  const l=document.getElementById("lista");
-  l.innerHTML="";
-  data.slice().reverse().forEach(m=>{
-    const d=document.createElement("div");
-    d.className="msg";
-    d.textContent=m.titulo+" — "+m.texto;
-    l.appendChild(d);
+  el("btnLimpiar").addEventListener("click", ()=>{
+    el("titulo").value=""; el("texto").value="";
+    el("titulo").focus();
   });
-}
+  ["titulo","texto"].forEach(id=>{
+    el(id).addEventListener("input", scheduleSave);
+  });
 
-renderPortada();
+  // Cover actions
+  const cover = el("cover");
+  el("btnEnter").addEventListener("click", ()=> cover.classList.add("hide"));
+  el("btnGoWrite").addEventListener("click", ()=>{
+    cover.classList.add("hide");
+    setTimeout(()=>{ el("titulo").focus(); window.scrollTo({top:0,behavior:"smooth"}); }, 180);
+  });
+
+  // Modals open
+  el("btnOpenSettings").addEventListener("click", ()=> openModal(settingsBack));
+  el("btnOpenSecret").addEventListener("click", ()=> openModal(secretBack));
+  el("btnSettingsQuick").addEventListener("click", ()=> openModal(settingsBack));
+  el("btnSecretQuick").addEventListener("click", ()=> openModal(secretBack));
+  el("dockSettings").addEventListener("click", ()=> openModal(settingsBack));
+  el("dockSecret").addEventListener("click", ()=> openModal(secretBack));
+  el("dockWrite").addEventListener("click", ()=>{
+    cover.classList.add("hide");
+    setTimeout(()=> el("titulo").focus(), 180);
+  });
+
+  // Close modals
+  el("settingsClose").addEventListener("click", ()=> closeModal(settingsBack));
+  el("btnCloseSettings").addEventListener("click", ()=> closeModal(settingsBack));
+  settingsBack.addEventListener("click",(e)=>{ if(e.target===settingsBack) closeModal(settingsBack); });
+
+  el("secretClose").addEventListener("click", ()=> closeModal(secretBack));
+  secretBack.addEventListener("click",(e)=>{ if(e.target===secretBack) closeModal(secretBack); });
+
+  // Save settings
+  el("btnSaveSettings").addEventListener("click", ()=>{
+    const d = el("togetherDate").value;
+    if(!d){ alert("Pon una fecha. Sin fecha no hay contador. 😌"); return; }
+    state.together.startDate = d;
+    state.together.startTime = el("togetherTime").value || "00:00";
+    state.together.label = el("togetherLabel").value || "Juntos";
+    save();
+    closeModal(settingsBack);
+  });
+
+  // Secret unlock
+  let unlockedKey="";
+  const secretZone = el("secretZone");
+
+  el("btnUnlock").addEventListener("click", ()=>{
+    const key = sanitize(el("secretKey").value);
+    if(!key){ alert("Pon una clave. Sin clave no hay cofre. 💌"); return; }
+    if(state.secrets.keyHash && state.secrets.keyHash !== simpleHash(key)){
+      alert("Esa clave no coincide. Aquí no se adivina, se recuerda. 😌");
+      return;
+    }
+    unlockedKey = key;
+    secretZone.style.display="block";
+    el("secretText").value = decryptPayload(key) || "";
+    el("secretText").focus();
+  });
+
+  el("btnSaveSecret").addEventListener("click", ()=>{
+    if(!unlockedKey){ alert("Primero abre con tu clave."); return; }
+    encryptAndStore(unlockedKey, el("secretText").value || "");
+    alert("Secreto guardado. 🌹");
+  });
+
+  el("btnLock").addEventListener("click", ()=>{
+    unlockedKey="";
+    el("secretKey").value="";
+    el("secretText").value="";
+    secretZone.style.display="none";
+    closeModal(secretBack);
+  });
+
+  // Easter: press logo to open secrets
+  let pressTimer=null;
+  const pressStart=()=>{ clearTimeout(pressTimer); pressTimer=setTimeout(()=>openModal(secretBack), 900); };
+  const pressEnd=()=> clearTimeout(pressTimer);
+  el("roseHeader").addEventListener("mousedown", pressStart);
+  el("roseHeader").addEventListener("mouseup", pressEnd);
+  el("roseHeader").addEventListener("mouseleave", pressEnd);
+  el("roseHeader").addEventListener("touchstart", pressStart, {passive:true});
+  el("roseHeader").addEventListener("touchend", pressEnd);
+
+  function syncSettingsUI(){
+    el("togetherDate").value = state.together.startDate || "";
+    el("togetherTime").value = state.together.startTime || "";
+    el("togetherLabel").value = state.together.label || "";
+  }
+
+  function renderAll(){
+    renderTogether();
+    renderCoverMessages();
+    renderList();
+    syncSettingsUI();
+  }
+
+  // ---------- init ----------
+  load();
+  seedPetals();
+
+  // Seed first entry if empty (para que la portada no se sienta sola)
+  if(state.entries.length === 0){
+    state.entries.push({
+      id: uid(),
+      createdAt: nowISO(),
+      title: "Página 1: El comienzo",
+      text:
+`Hoy abro este espacio como quien abre un cofre.
+Aquí guardamos lo que sí vale: miradas, promesas, fechas y detalles.
+Si el tiempo corre… que corra. Nosotros dejamos huella. ♾️`
+    });
+    save();
+  } else {
+    renderAll();
+  }
+
+  setInterval(renderTogether, 20000);
+})();
 </script>
 
 </body>
