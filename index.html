@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuestra Historia ♾️💖</title>
+<meta name="description" content="Diario romántico con portada, contador de días juntos y mensajes visibles">
+<style>
+body{margin:0;font-family:system-ui;background:#120720;color:#fff}
+.cover{min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#ff4da655,#120720)}
+.card{background:#1e0f33;border-radius:24px;padding:24px;max-width:800px;width:92%}
+h1{margin-top:0}
+button{padding:12px 16px;border-radius:14px;border:none;background:#ff4da6;color:#fff;font-weight:700;cursor:pointer}
+.msg{background:#2a1845;padding:12px;border-radius:14px;margin-top:10px}
+input,textarea{width:100%;padding:10px;border-radius:10px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<section class="cover" id="cover">
+  <div class="card">
+    <h1>🌹 Nuestra Historia ♾️</h1>
+    <p>🕯️ Donde lo escrito se queda</p>
+    <div id="mensajes"></div>
+    <button onclick="entrar()">💖 Entrar a escribir</button>
+  </div>
+</section>
+
+<section id="app" style="display:none;padding:20px">
+  <h2>📖 Escribe tu historia</h2>
+  <input id="titulo" placeholder="Título">
+  <textarea id="texto" placeholder="Escribe aquí..."></textarea>
+  <button onclick="guardar()">Guardar</button>
+  <div id="lista"></div>
+</section>
+
+<script>
+const KEY="HISTORIA_FINAL";
+let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+
+function renderPortada(){
+  const box=document.getElementById("mensajes");
+  box.innerHTML="";
+  data.slice(-3).reverse().forEach(m=>{
+    const d=document.createElement("div");
+    d.className="msg";
+    d.textContent=m.titulo+" — "+m.texto.slice(0,80);
+    box.appendChild(d);
+  });
+}
+
+function entrar(){
+  document.getElementById("cover").style.display="none";
+  document.getElementById("app").style.display="block";
+  renderLista();
+}
+
+function guardar(){
+  const t=document.getElementById("titulo").value;
+  const x=document.getElementById("texto").value;
+  if(!t && !x) return;
+  data.push({titulo:t,texto:x,fecha:new Date()});
+  localStorage.setItem(KEY,JSON.stringify(data));
+  document.getElementById("titulo").value="";
+  document.getElementById("texto").value="";
+  renderLista();
+  renderPortada();
+}
+
+function renderLista(){
+  const l=document.getElementById("lista");
+  l.innerHTML="";
+  data.slice().reverse().forEach(m=>{
+    const d=document.createElement("div");
+    d.className="msg";
+    d.textContent=m.titulo+" — "+m.texto;
+    l.appendChild(d);
+  });
+}
+
+renderPortada();
+</script>
+
+</body>
+</html>
