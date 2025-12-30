@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Nuestra Agenda ♾️</title>
+  <meta name="description" content="Agenda + diario de momentos importantes con contador, guardado automático y exportación."/>
+  <style>
+    :root{
+      --bg0:#0b0613;
+      --bg1:#140a22;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.06);
+      --line: rgba(255,255,255,.14);
+      --txt: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --soft: rgba(255,255,255,.55);
+      --accent:#ff4d8d;      /* rosa elegante */
+      --accent2:#ffd3a0;     /* dorado suave */
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1080px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--txt);
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(255,77,141,.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 20%, rgba(255,211,160,.12), transparent 55%),
+        radial-gradient(900px 600px at 40% 85%, rgba(122,92,255,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    /* top bar */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(10,6,18,.85), rgba(10,6,18,.55));
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .wrap{max-width:var(--max); margin:0 auto; padding:14px 16px;}
+    .row{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
+    .brand{
+      display:flex; gap:10px; align-items:center;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:12px; height:12px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
+      box-shadow: 0 0 20px rgba(255,77,141,.35);
+    }
+    .brand b{font-size:15px}
+    .brand span{color:var(--muted); font-size:12px}
+
+    nav{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .chip{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--txt);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .chip:hover{transform: translateY(-1px); border-color: rgba(255,77,141,.35)}
+    .chip:active{transform: translateY(0px) scale(.99)}
+    .chip.primary{
+      border-color: rgba(255,77,141,.45);
+      background: linear-gradient(180deg, rgba(255,77,141,.18), rgba(255,255,255,.06));
+    }
+
+    /* hero */
+    .hero{
+      position:relative;
+      padding: 22px 16px 0;
+    }
+    .heroGrid{
+      max-width:var(--max);
+      margin: 0 auto;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+      align-items:stretch;
+    }
+    @media (max-width: 920px){
+      .heroGrid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardPad{padding:18px}
+    .h1{
+      font-size:28px;
+      line-height:1.1;
+      margin:0 0 10px 0;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:0 0 14px 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .cover{
+      position:relative;
+      min-height: 330px;
+      border-radius: var(--radius2);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(800px 450px at 10% 10%, rgba(255,77,141,.20), transparent 60%),
+        radial-gradient(600px 400px at 90% 20%, rgba(255,211,160,.14), transparent 65%),
+        rgba(255,255,255,.05);
+    }
+    .coverImg{
+      position:absolute; inset:0;
+      background-image: url("assets/portada.png");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.08) contrast(1.02);
+      transform: scale(1.02);
+    }
+    .coverShade{
+      position:absolute; inset:0;
+      background:
+        linear-gradient(90deg, rgba(10,6,18,.70), rgba(10,6,18,.25)),
+        linear-gradient(180deg, rgba(10,6,18,.25), rgba(10,6,18,.65));
+    }
+    .coverFrame{
+      position:absolute; inset:14px;
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+    }
+    .coverText{
+      position:absolute; left:18px; right:18px; bottom:18px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .quote{
+      font-size:14px;
+      color: rgba(255,255,255,.88);
+      max-width: 58ch;
+      margin:0;
+    }
+    .sig{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      color: rgba(255,255,255,.80);
+      font-size:12px;
+    }
+    .pill{
+      padding:7px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      display:flex; gap:8px; align-items:center;
+    }
+
+    /* counter */
+    .counter{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      margin-top: 12px;
+    }
+    @media (max-width:520px){
+      .counter{grid-template-columns: repeat(2,1fr)}
+    }
+    .kpi{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 16px;
+      padding: 10px 12px;
+    }
+    .kpi b{display:block; font-size:16px}
+    .kpi span{display:block; color:var(--muted); font-size:12px; margin-top:2px}
+
+    /* main sections */
+    main{padding: 14px 16px 38px}
+    .grid{
+      max-width:var(--max);
+      margin: 0 auto;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 920px){.grid{grid-template-columns:1fr}}
+
+    label{display:block; font-size:12px; color:var(--muted); margin: 10px 0 6px}
+    input, textarea, select{
+      width:100%;
+      background: rgba(10,6,18,.55);
+      color: var(--txt);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 10px 12px;
+      outline:none;
+    }
+    textarea{min-height:120px; resize:vertical}
+    input:focus, textarea:focus, select:focus{border-color: rgba(255,77,141,.55); box-shadow: 0 0 0 4px rgba(255,77,141,.10)}
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      font-weight:600;
+      font-size:13px;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,77,141,.38)}
+    .btn:active{transform: translateY(0px) scale(.99)}
+    .btn.primary{
+      border-color: rgba(255,77,141,.50);
+      background: linear-gradient(180deg, rgba(255,77,141,.20), rgba(255,255,255,.06));
+    }
+    .btn.ghost{
+      background: transparent;
+    }
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+
+    /* timeline */
+    .timeline{display:flex; flex-direction:column; gap:10px; margin-top:10px}
+    .entry{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 18px;
+      padding: 12px 12px 10px;
+      display:flex; gap:12px; align-items:flex-start;
+    }
+    .badge{
+      flex:0 0 auto;
+      width:34px; height:34px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,77,141,.35));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      color:#1a0a12;
+      font-weight:900;
+    }
+    .entry h4{margin:0; font-size:14px; letter-spacing:.1px}
+    .meta{color:var(--muted); font-size:12px; margin-top:2px}
+    .entry p{margin:8px 0 0 0; color: rgba(255,255,255,.86); font-size:13px; line-height:1.45; white-space:pre-wrap}
+    .entry .actions{margin-left:auto; display:flex; gap:8px}
+    .iconBtn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--txt);
+      width:34px; height:34px;
+      border-radius: 12px;
+      cursor:pointer;
+      display:grid; place-items:center;
+    }
+    .iconBtn:hover{border-color: rgba(255,77,141,.35)}
+    .iconBtn:active{transform: scale(.99)}
+
+    footer{
+      max-width:var(--max);
+      margin: 18px auto 0;
+      padding: 0 16px;
+      color: var(--soft);
+      font-size: 12px;
+      text-align:center;
+    }
+
+    /* floating petals/hearts */
+    .floatLayer{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:5;
+      overflow:hidden;
+    }
+    .float{
+      position:absolute;
+      top:-12vh;
+      opacity:.55;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+      animation: fall linear forwards;
+      will-change: transform, opacity;
+      user-select:none;
+    }
+    .float.heart{opacity:.48}
+    @keyframes fall{
+      0%{ transform: translate3d(0, -12vh, 0) rotate(0deg); opacity:0}
+      12%{opacity:.70}
+      100%{ transform: translate3d(var(--dx), 112vh, 0) rotate(var(--rot)); opacity:0}
+    }
+
+    /* print */
+    @media print{
+      header, .floatLayer, .noPrint{display:none !important}
+      body{background:#fff; color:#111}
+      .card, .cover{box-shadow:none}
+      .card{border:1px solid #ddd; background:#fff}
+      input, textarea{border:1px solid #ccc; color:#111; background:#fff}
+      .meta{color:#444}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="floatLayer" id="floatLayer" aria-hidden="true"></div>
+
+  <header>
+    <div class="wrap">
+      <div class="row">
+        <div class="brand">
+          <div class="dot"></div>
+          <div>
+            <b>Nuestra Agenda ♾️</b><br/>
+            <span>elegante, guardada, y lista para volverse memoria</span>
+          </div>
+        </div>
+
+        <nav class="noPrint">
+          <button class="chip" onclick="scrollToId('diario')">📔 Diario</button>
+          <button class="chip" onclick="scrollToId('lineaTiempo')">🕯️ Línea del tiempo</button>
+          <button class="chip primary" onclick="exportPDF()">🖨️ PDF</button>
+          <button class="chip" onclick="exportJSON()">💾 Exportar</button>
+          <button class="chip" onclick="importJSON()">📥 Importar</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="heroGrid">
+      <div class="card">
+        <div class="cardPad">
+          <h1 class="h1">Nuestro recuento, sin prisa. <span style="color:var(--accent)">Con intención.</span></h1>
+          <p class="sub">Anota momentos importantes, guárdalos automático, y cuando quieras… imprímelos como diario. Tradición moderna: escribir para no olvidar.</p>
+
+          <div class="card" style="border-radius:18px; box-shadow:none; background:rgba(255,255,255,.05)">
+            <div class="cardPad">
+              <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; justify-content:space-between">
+                <div style="min-width:240px; flex:1">
+                  <label>⏱️ Inicio de la relación (hora Chihuahua)</label>
+                  <div style="display:flex; gap:10px; flex-wrap:wrap">
+                    <input id="startDate" type="date"/>
+                    <input id="startTime" type="time" step="60"/>
+                  </div>
+                  <div class="meta" style="margin-top:6px">Tip: si el contador no te cuadra, ajusta aquí y se guarda.</div>
+                </div>
+
+                <div class="btnRow noPrint" style="margin-top:0">
+                  <button class="btn ghost" onclick="resetDemo()">✨ Rellenar ejemplo</button>
+                  <button class="btn" onclick="clearAll()">🧹 Borrar todo</button>
+                  <button class="btn primary" onclick="saveStart()">💗 Guardar inicio</button>
+                </div>
+              </div>
+
+              <div class="counter" id="counter">
+                <div class="kpi"><b id="kYears">0</b><span>Años</span></div>
+                <div class="kpi"><b id="kMonths">0</b><span>Meses</span></div>
+                <div class="kpi"><b id="kDays">0</b><span>Días</span></div>
+                <div class="kpi"><b id="kHours">0</b><span>Horas</span></div>
+                <div class="kpi"><b id="kMinutes">0</b><span>Minutos</span></div>
+                <div class="kpi"><b id="kSeconds">0</b><span>Segundos</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="cover">
+        <div class="coverImg"></div>
+        <div class="coverShade"></div>
+        <div class="coverFrame"></div>
+        <div class="coverText">
+          <p class="quote" id="coverQuote">“Lo nuestro no es ruido: es hogar. Y hogar se cuida.”</p>
+          <div class="sig">
+            <div class="pill">💞 <span id="coverNames">Mi amor & Yo</span></div>
+            <div class="pill">🗓️ <span id="coverSince">Desde 08/08 · 8:00 pm</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="grid">
+
+      <section class="card" id="diario">
+        <div class="cardPad">
+          <h2 style="margin:0 0 6px 0; font-size:18px">📔 Diario de momentos</h2>
+          <p class="sub" style="margin:0 0 10px 0">Escribe simple, escribe bonito. Lo que vale, se deja por escrito.</p>
+
+          <label>🫶 Nombres en portada</label>
+          <input id="names" placeholder="Ej: Cecy & Fran" />
+
+          <label>💬 Frase en la portada</label>
+          <input id="quote" placeholder="Ej: ‘Contigo, todo se vuelve hogar.’" />
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <div style="flex:1; min-width:160px">
+              <label>📅 Fecha del momento</label>
+              <input id="mDate" type="date"/>
+            </div>
+            <div style="flex:2; min-width:220px">
+              <label>✨ Título</label>
+              <input id="mTitle" placeholder="Ej: Nuestra primera cena sin prisa" />
+            </div>
+          </div>
+
+          <label>📝 Lo que pasó (sin filtros)</label>
+          <textarea id="mText" placeholder="Escribe aquí…"></textarea>
+
+          <div class="btnRow noPrint">
+            <button class="btn primary" onclick="addEntry()">Guardar momento 💾</button>
+            <button class="btn" onclick="quickLove()">+ Un detalle bonito</button>
+          </div>
+
+          <div class="meta" style="margin-top:10px">Se guarda solo en este dispositivo (localStorage). Para respaldar: usa “Exportar”.</div>
+        </div>
+      </section>
+
+      <section class="card" id="lineaTiempo">
+        <div class="cardPad">
+          <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap">
+            <h2 style="margin:0; font-size:18px">🕯️ Línea del tiempo</h2>
+            <div class="noPrint" style="display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn" onclick="sortEntries('new')">Más reciente</button>
+              <button class="btn" onclick="sortEntries('old')">Más antiguo</button>
+            </div>
+          </div>
+
+          <div class="timeline" id="timeline"></div>
+
+          <div class="meta" style="margin-top:10px">Tip: imprime en PDF para tener tu diario en papel. Clásico, elegante, eterno.</div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="noPrint">
+      Hecho para guardar amor del real: el que se cuida, se escribe y se respeta. ♾️
+    </footer>
+  </main>
+
+  <input id="fileInput" type="file" accept="application/json" style="display:none"/>
+
+<script>
+/* ========== Utilities ========== */
+const $ = (id)=>document.getElementById(id);
+const STORAGE_KEY = "agenda_amor_v1";
+const START_KEY = "agenda_amor_start_v1";
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+function scrollToId(id){ document.getElementById(id).scrollIntoView({behavior:"smooth", block:"start"}); }
+
+/* ========== Floating petals/hearts ========== */
+const floatLayer = $("floatLayer");
+const icons = [
+  {cls:"petal", char:"🌸"},
+  {cls:"petal", char:"🌷"},
+  {cls:"petal", char:"🍃"},
+  {cls:"heart", char:"💗"},
+  {cls:"heart", char:"💞"},
+];
+
+function spawnFloat(){
+  const el = document.createElement("div");
+  const pick = icons[Math.floor(Math.random()*icons.length)];
+  el.className = "float " + pick.cls;
+  el.textContent = pick.char;
+
+  const left = Math.random()*100;
+  const size = 16 + Math.random()*20;
+  const dur = 7 + Math.random()*7;
+  const dx = (Math.random()*2 - 1) * 22 + "vw";
+  const rot = (Math.random()*2 - 1) * 140 + "deg";
+
+  el.style.left = left + "vw";
+  el.style.fontSize = size + "px";
+  el.style.animationDuration = dur + "s";
+  el.style.setProperty("--dx", dx);
+  el.style.setProperty("--rot", rot);
+
+  floatLayer.appendChild(el);
+  setTimeout(()=> el.remove(), dur*1000 + 200);
+}
+setInterval(spawnFloat, 520);   // ritmo elegante: constante, no invasivo
+
+/* ========== Data ========== */
+let state = {
+  names: "Mi amor & Yo",
+  quote: "“Lo nuestro no es ruido: es hogar. Y hogar se cuida.”",
+  entries: [],
+  sort: "new"
+};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) state = JSON.parse(raw);
+  }catch(e){}
+  // hydrate UI
+  $("names").value = state.names || "";
+  $("quote").value = state.quote || "";
+  $("coverNames").textContent = state.names || "Mi amor & Yo";
+  $("coverQuote").textContent = state.quote || "“Lo nuestro no es ruido: es hogar. Y hogar se cuida.”";
+  renderTimeline();
+}
+
+function saveState(){
+  // sync cover
+  state.names = $("names").value.trim() || "Mi amor & Yo";
+  state.quote = $("quote").value.trim() || "“Lo nuestro no es ruido: es hogar. Y hogar se cuida.”";
+  $("coverNames").textContent = state.names;
+  $("coverQuote").textContent = state.quote;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+$("names").addEventListener("input", saveState);
+$("quote").addEventListener("input", saveState);
+
+/* ========== Start date/time (Chihuahua) ========== */
+function defaultStart(){
+  // Por defecto: 08/08/2025 20:00 (ajustable)
+  const d = localStorage.getItem(START_KEY);
+  if(d){
+    const obj = JSON.parse(d);
+    $("startDate").value = obj.date;
+    $("startTime").value = obj.time;
+    return;
+  }
+  $("startDate").value = "2025-08-08";
+  $("startTime").value = "20:00";
+}
+
+function saveStart(){
+  const date = $("startDate").value || "2025-08-08";
+  const time = $("startTime").value || "20:00";
+  localStorage.setItem(START_KEY, JSON.stringify({date,time}));
+  updateSinceLabel();
+}
+
+function getStart(){
+  const raw = localStorage.getItem(START_KEY);
+  let date="2025-08-08", time="20:00";
+  if(raw){
+    try{
+      const obj = JSON.parse(raw);
+      date = obj.date || date;
+      time = obj.time || time;
+    }catch(e){}
+  }
+  // interpret as local time (user's device). Chihuahua is UTC-6 typically; user asked "hora Chihuahua"
+  // We'll label as such and keep editable.
+  return new Date(date + "T" + time + ":00");
+}
+
+function updateSinceLabel(){
+  const d = getStart();
+  const dd = pad2(d.getDate());
+  const mm = pad2(d.getMonth()+1);
+  const yyyy = d.getFullYear();
+  let hours = d.getHours();
+  const mins = pad2(d.getMinutes());
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12; if(hours === 0) hours = 12;
+  $("coverSince").textContent = `Desde ${dd}/${mm}/${yyyy} · ${hours}:${mins} ${ampm}`;
+}
+
+$("startDate").addEventListener("change", saveStart);
+$("startTime").addEventListener("change", saveStart);
+
+/* ========== Counter (years, months, days, h/m/s) ========== */
+function diffYMDHMS(from, to){
+  // calendar-like diff (not just milliseconds)
+  let y = to.getFullYear() - from.getFullYear();
+  let m = to.getMonth() - from.getMonth();
+  let d = to.getDate() - from.getDate();
+
+  // adjust days
+  if(d < 0){
+    // borrow from previous month
+    const prev = new Date(to.getFullYear(), to.getMonth(), 0); // last day of prev month
+    d += prev.getDate();
+    m -= 1;
+  }
+  if(m < 0){
+    m += 12;
+    y -= 1;
+  }
+
+  // time diff
+  let hh = to.getHours() - from.getHours();
+  let mmn = to.getMinutes() - from.getMinutes();
+  let ss = to.getSeconds() - from.getSeconds();
+
+  if(ss < 0){ ss += 60; mmn -= 1; }
+  if(mmn < 0){ mmn += 60; hh -= 1; }
+  if(hh < 0){
+    hh += 24;
+    // borrow one day
+    d -= 1;
+    if(d < 0){
+      // borrow one month
+      const prev = new Date(to.getFullYear(), to.getMonth(), 0);
+      d += prev.getDate();
+      m -= 1;
+      if(m < 0){ m += 12; y -= 1; }
+    }
+  }
+  return {y,m,d,hh,mm:mmn,ss};
+}
+
+function tick(){
+  const start = getStart();
+  const now = new Date();
+  let a = start, b = now;
+  if(now < start){ a = now; b = start; } // handle if start in future (just in case)
+  const dif = diffYMDHMS(a,b);
+
+  $("kYears").textContent = Math.max(0, dif.y);
+  $("kMonths").textContent = Math.max(0, dif.m);
+  $("kDays").textContent = Math.max(0, dif.d);
+  $("kHours").textContent = Math.max(0, dif.hh);
+  $("kMinutes").textContent = Math.max(0, dif.mm);
+  $("kSeconds").textContent = Math.max(0, dif.ss);
+}
+setInterval(tick, 1000);
+
+/* ========== Entries ========== */
+function addEntry(){
+  const date = $("mDate").value;
+  const title = $("mTitle").value.trim();
+  const text = $("mText").value.trim();
+
+  if(!date || !title || !text){
+    alert("Te falta algo: fecha, título y texto. El amor se escribe completo 😌");
+    return;
+  }
+  state.entries.push({
+    id: crypto.randomUUID(),
+    date, title, text,
+    createdAt: Date.now()
+  });
+  $("mTitle").value = "";
+  $("mText").value = "";
+  saveState();
+  renderTimeline();
+  scrollToId("lineaTiempo");
+}
+
+function delEntry(id){
+  if(!confirm("¿Borrar este momento? (No se puede des-borrar)")) return;
+  state.entries = state.entries.filter(e=>e.id!==id);
+  saveState();
+  renderTimeline();
+}
+
+function editEntry(id){
+  const e = state.entries.find(x=>x.id===id);
+  if(!e) return;
+  const newTitle = prompt("Editar título:", e.title);
+  if(newTitle===null) return;
+  const newText = prompt("Editar texto:", e.text);
+  if(newText===null) return;
+
+  e.title = newTitle.trim() || e.title;
+  e.text = newText.trim() || e.text;
+  saveState();
+  renderTimeline();
+}
+
+function sortEntries(mode){
+  state.sort = mode;
+  saveState();
+  renderTimeline();
+}
+
+function renderTimeline(){
+  const box = $("timeline");
+  box.innerHTML = "";
+
+  let arr = [...(state.entries||[])];
+  arr.sort((a,b)=> state.sort==="old" ? (a.createdAt-b.createdAt) : (b.createdAt-a.createdAt));
+
+  if(arr.length===0){
+    const empty = document.createElement("div");
+    empty.className = "entry";
+    empty.innerHTML = `
+      <div class="badge">∞</div>
+      <div>
+        <h4>Tu historia aún está en blanco.</h4>
+        <div class="meta">Y eso es poder: aquí empieza lo eterno.</div>
+        <p>Escribe tu primer momento arriba 👆</p>
+      </div>
+    `;
+    box.appendChild(empty);
+    return;
+  }
+
+  arr.forEach((e, idx)=>{
+    const d = new Date(e.date + "T00:00:00");
+    const dd = pad2(d.getDate());
+    const mm = pad2(d.getMonth()+1);
+    const yyyy = d.getFullYear();
+
+    const node = document.createElement("div");
+    node.className = "entry";
+    node.innerHTML = `
+      <div class="badge">${idx+1}</div>
+      <div style="min-width:0">
+        <h4>${escapeHTML(e.title)}</h4>
+        <div class="meta">${dd}/${mm}/${yyyy}</div>
+        <p>${escapeHTML(e.text)}</p>
+      </div>
+      <div class="actions noPrint">
+        <button class="iconBtn" title="Editar" onclick="editEntry('${e.id}')">✏️</button>
+        <button class="iconBtn" title="Borrar" onclick="delEntry('${e.id}')">🗑️</button>
+      </div>
+    `;
+    box.appendChild(node);
+  });
+}
+
+function escapeHTML(s){
+  return (s||"").replace(/[&<>"']/g, (c)=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+/* ========== Export / Import ========== */
+function download(name, content, type="application/octet-stream"){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 600);
+}
+
+function exportJSON(){
+  saveState();
+  const start = JSON.parse(localStorage.getItem(START_KEY) || '{"date":"2025-08-08","time":"20:00"}');
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    start,
+    state
+  };
+  download("Nuestro_Diario_Backup.json", JSON.stringify(payload, null, 2), "application/json");
+}
+
+function importJSON(){
+  const input = $("fileInput");
+  input.value = "";
+  input.onchange = async ()=>{
+    const file = input.files && input.files[0];
+    if(!file) return;
+    const txt = await file.text();
+    try{
+      const payload = JSON.parse(txt);
+      if(payload?.state){
+        state = payload.state;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+      if(payload?.start){
+        localStorage.setItem(START_KEY, JSON.stringify(payload.start));
+      }
+      defaultStart();
+      updateSinceLabel();
+      loadState();
+      alert("Listo. Tu historia volvió a casa 💗");
+    }catch(e){
+      alert("Ese archivo no se pudo leer. Intenta con el backup .json que exportaste aquí.");
+    }
+  };
+  input.click();
+}
+
+function exportPDF(){
+  // Usa estilos @media print para que salga elegante en PDF
+  window.print();
+}
+
+/* ========== Extras ========== */
+function quickLove(){
+  const phrases = [
+    "Hoy me di cuenta que contigo respiro más bonito.",
+    "No es suerte: es elección. Y te elijo otra vez.",
+    "Lo simple contigo se vuelve sagrado.",
+    "Amar también es cuidar el detalle.",
+    "Nuestro amor: firme, sereno, con futuro."
+  ];
+  $("mText").value = ( $("mText").value.trim() ? ($("mText").value.trim() + "\n\n") : "" ) + phrases[Math.floor(Math.random()*phrases.length)];
+}
+
+function resetDemo(){
+  state.names = "Cecy & Mi amor";
+  state.quote = "“Contigo, lo eterno se siente normal.”";
+  state.entries = [
+    {id: crypto.randomUUID(), date:"2025-08-08", title:"Nos hicimos novios (8:00 pm)", text:"Ese ‘sí’ fue mi paz. Y desde entonces, mi corazón trae dirección.", createdAt: Date.now()-100000000},
+    {id: crypto.randomUUID(), date:"2025-09-01", title:"Primera foto que guardé como tesoro", text:"No fue la foto. Fue la certeza detrás: aquí es.", createdAt: Date.now()-80000000},
+    {id: crypto.randomUUID(), date:"2025-10-15", title:"Un abrazo que me arregló el día", text:"De esos abrazos que no preguntan nada… solo acomodan el alma.", createdAt: Date.now()-60000000},
+  ];
+  $("names").value = state.names;
+  $("quote").value = state.quote;
+  saveState();
+  renderTimeline();
+}
+
+function clearAll(){
+  if(!confirm("¿Borrar TODO (momentos + portada)? Esto es serio.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  // NO borramos el inicio a menos que quieras, pero aquí lo dejamos
+  state = {names:"Mi amor & Yo", quote:"“Lo nuestro no es ruido: es hogar. Y hogar se cuida.”", entries:[], sort:"new"};
+  loadState();
+  renderTimeline();
+}
+
+/* init */
+defaultStart();
+saveStart();
+updateSinceLabel();
+loadState();
+tick();
+</script>
+</body>
+</html>
